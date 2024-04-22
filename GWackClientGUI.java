@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.io.*;
+import java.net.*;
 //GUI for the client side of the GWack channel
 public class GWackClientGUI extends JFrame {
     //text fields for name, IP address, and port
@@ -14,6 +17,8 @@ public class GWackClientGUI extends JFrame {
     private JTextArea memsOnline;
     private JTextArea messages;
     private JTextArea composeMessage;
+    private boolean isConnected = false;
+    private ClientNetworking c;
     public GWackClientGUI() {
         super();
 
@@ -56,7 +61,60 @@ public class GWackClientGUI extends JFrame {
         JPanel fpanel = new JPanel(new BorderLayout());
         fpanel.add(bpanel, BorderLayout.NORTH);
         fpanel.add(cpanel, BorderLayout.SOUTH);
+        name.setText("Hadya");
+        IPAddress.setText("localhost");
+        portNum.setText("8082");
         //adds all panels into the window in a proper orientation
+        connectionButton.addActionListener((e) -> {
+            if(connectionButton.getText().equals("Connect"))
+            {
+                try {
+                    String n = name.getText();
+                    String ip = IPAddress.getText();
+                    int p = Integer.parseInt(portNum.getText());
+                    c = new ClientNetworking(n, ip, p, this);
+                    connectionButton.setText("Disconnect");
+                    name.setEditable(false);
+                    IPAddress.setEditable(false);
+                    portNum.setEditable(false);
+                    isConnected = true;
+                    //messages.setText(c.getIn().readLine());
+                }
+                catch (Throwable s) {
+                    if(portNum.getText().equals(""))
+                    {
+                        Frame frame = new Frame();
+                        JOptionPane.showMessageDialog(frame, "Invalid port", "Connection Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else
+                    {
+                        Frame frame = new Frame();
+                        JOptionPane.showMessageDialog(frame,"Cannot Connect", "Connection Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+            else
+            {
+                c.disconnect();
+                connectionButton.setText("Connect");
+                name.setText("");
+                IPAddress.setText("");
+                portNum.setText("");
+                messages.setText("");
+                memsOnline.setText("");
+                name.setEditable(true);
+                IPAddress.setEditable(true);
+                portNum.setEditable(true);
+                isConnected = false;
+            }
+        });
+        sendButton.addActionListener((e) -> {
+            if(isConnected)
+            {
+                c.writeMsg(composeMessage.getText());
+                composeMessage.setText("");
+            }
+        });
         this.add(apanel, BorderLayout.NORTH);
         this.add(fpanel, BorderLayout.CENTER);
         this.add(dpanel, BorderLayout.WEST);
@@ -64,11 +122,21 @@ public class GWackClientGUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
 
-
     }
     public static void main(String[] args) {
         GWackClientGUI f = new GWackClientGUI();
         f.setTitle("GWack -- GW Slack Simulator");
         f.setVisible(true);
+        
+    }
+    public JTextArea getMembersTextArea(){
+        if(messages != null)
+            return memsOnline;
+        return null;
+    }
+    public JTextArea getDisplayTextArea(){
+        if(messages != null)
+            return messages;
+        return null;
     }
 }
