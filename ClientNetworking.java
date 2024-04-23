@@ -18,6 +18,7 @@ public class ClientNetworking {
         try {
             socket = new Socket(IPAddress, port);
             pw = new PrintWriter(socket.getOutputStream());
+            //prints out secret key
             pw.println("SECRET");
             pw.flush();
             pw.println("3c3c4ac618656ae32b7f3431e75f7b26b1a14a87");
@@ -27,11 +28,12 @@ public class ClientNetworking {
             pw.println(name);
             pw.flush();
             bf = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            ReadingThread reader = new ReadingThread(bf, gui, name);
+            //creates a reading thread
+            ReadingThread reader = new ReadingThread(bf, gui);
             reader.start();
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -65,30 +67,34 @@ public class ClientNetworking {
     }
 
 
-
+    //private reading thread class
     private class ReadingThread extends Thread {
         private BufferedReader buffer;
         private GWackClientGUI readingGUI;
-        private String user;
-        public ReadingThread(BufferedReader buffer, GWackClientGUI readingGUI, String user) {
+        private String members = "";
+        public ReadingThread(BufferedReader buffer, GWackClientGUI readingGUI) {
             this.buffer = buffer;
             this.readingGUI = readingGUI;
-            this.user = user;
         }
 
         public void run() {
             while (true) {
                 try {
                     String message = this.buffer.readLine();
+                    //sends members list to the GUI
                     if(message.equals("START_CLIENT_LIST"))
                     {
                         while(!(message = buffer.readLine()).equals("END_CLIENT_LIST"))
                         {
                             this.readingGUI.getMembersTextArea().append(message + "\n");
+                            readingGUI.pack();
                         }
+                        readingGUI.pack();
                     }
+                    //sends messages to the GUI
                     if (message != null && this.readingGUI.getDisplayTextArea() != null && !(message.equals("null")) && readingGUI != null && !(message.equals("END_CLIENT_LIST"))) {
                         this.readingGUI.getDisplayTextArea().append(message + "\n");
+                        readingGUI.pack();
                     }
                 } catch (Exception e) {
                     //System.out.println(e);

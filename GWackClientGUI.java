@@ -61,10 +61,7 @@ public class GWackClientGUI extends JFrame {
         JPanel fpanel = new JPanel(new BorderLayout());
         fpanel.add(bpanel, BorderLayout.NORTH);
         fpanel.add(cpanel, BorderLayout.SOUTH);
-        name.setText("Hadya");
-        IPAddress.setText("localhost");
-        portNum.setText("8082");
-        //adds all panels into the window in a proper orientation
+        //button listener to connect and disconnect from the server
         connectionButton.addActionListener((e) -> {
             if(connectionButton.getText().equals("Connect"))
             {
@@ -78,14 +75,15 @@ public class GWackClientGUI extends JFrame {
                     IPAddress.setEditable(false);
                     portNum.setEditable(false);
                     isConnected = true;
-                    //messages.setText(c.getIn().readLine());
                 }
                 catch (Throwable s) {
+                    //pop up for invalid port
                     if(portNum.getText().equals(""))
                     {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Invalid port", "Connection Error", JOptionPane.ERROR_MESSAGE);
                     }
+                    //pop up for connection error
                     else
                     {
                         Frame frame = new Frame();
@@ -108,6 +106,7 @@ public class GWackClientGUI extends JFrame {
                 isConnected = false;
             }
         });
+        //sends messages if send button is clicked
         sendButton.addActionListener((e) -> {
             if(isConnected)
             {
@@ -115,6 +114,7 @@ public class GWackClientGUI extends JFrame {
                 composeMessage.setText("");
             }
         });
+        //adds panels in proper orientation
         this.add(apanel, BorderLayout.NORTH);
         this.add(fpanel, BorderLayout.CENTER);
         this.add(dpanel, BorderLayout.WEST);
@@ -124,16 +124,20 @@ public class GWackClientGUI extends JFrame {
 
     }
     public static void main(String[] args) {
+        //launches a gui
         GWackClientGUI f = new GWackClientGUI();
         f.setTitle("GWack -- GW Slack Simulator");
         f.setVisible(true);
         
     }
+
+    //returns members list on gui
     public JTextArea getMembersTextArea(){
         if(messages != null)
             return memsOnline;
         return null;
     }
+    //returns list of messages on gui
     public JTextArea getDisplayTextArea(){
         if(messages != null)
             return messages;

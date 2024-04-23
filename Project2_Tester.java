@@ -274,7 +274,7 @@ public class Project2_Tester {
         cN3.getOut().flush();
         Thread.sleep(500);
         assertEquals("START_CLIENT_LIST\nJane\nJohn\nRavi\nEND_CLIENT_LIST", server.getClientList());
-        
+
         cN1.writeMsg("red");
         Thread.sleep(500);
 
@@ -361,8 +361,7 @@ public class Project2_Tester {
         Thread.sleep(500);
 
         String[] pieces = gui1.getDisplayTextArea().getText().split("\n");
-        for(int i=0; i<pieces.length; i++)
-            System.out.println(pieces[i]);
+
         assertEquals("[John] blue", pieces[pieces.length - 1]);
         assertEquals("[Jane] pink", pieces[pieces.length - 2]);
         assertEquals("[Jane] green", pieces[pieces.length - 3]);

@@ -2,9 +2,8 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 public class GWackChannel {
-    private ServerSocket serverSocket;
-    private volatile ArrayList<ClientThread> connectedClients;
-    //private volatile ArrayList<String> clientList;
+    private volatile ServerSocket serverSocket;
+    private volatile static ArrayList<ClientThread> connectedClients;
     private volatile Queue<String> outputQueue;
     public GWackChannel(int port){
         try {
@@ -13,34 +12,30 @@ public class GWackChannel {
             outputQueue = new LinkedList<>();
         }
         catch(IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
     public ServerSocket getServerSocket(){
         return serverSocket;
     }
-    public ArrayList<ClientThread> getConnectedClients(){
+    public synchronized ArrayList<ClientThread> getConnectedClients(){
         return connectedClients;
     }
-    public Queue<String> getOutputQueue(){
+    public synchronized Queue<String> getOutputQueue(){
         return outputQueue;
     }
+    //adds messages to outputQueue
     public synchronized void addOutput(String msg)
     {
         outputQueue.add(msg);
     }
+    //dequeues messages from outputQueue
     public synchronized String removeOutput()
     {
         return outputQueue.poll();
     }
-    public synchronized void broadcast(String msg)
-    {
-        for(ClientThread client : connectedClients)
-        {
-            client.sendMessage(msg);
-        }
-    }
-    public String getClientList(){
+    //returns the clientList
+    public synchronized String getClientList(){
         String list = "START_CLIENT_LIST" + "\n";
         for(int i=0; i<connectedClients.size(); i++)
         {
@@ -49,10 +44,12 @@ public class GWackChannel {
         list += "END_CLIENT_LIST";
         return list;
     }
-    public void addClient(ClientThread c){
+    //adds a new clientThread to the list of clients
+    public synchronized void addClient(ClientThread c){
         connectedClients.add(c);
     }
-    public void removeClients(){
+    //removes any clinets that are no longer connected
+    public synchronized void removeClients(){
         for(int i=0; i<getConnectedClients().size(); i++)
         {
             if(!(getConnectedClients().get(i).valid))
@@ -61,7 +58,8 @@ public class GWackChannel {
             }
         }
     }
-    public synchronized void serve(int x){
+    //waits for a new client to connect to the server
+    public void serve(int x){
         while(x == -1){
             try{
                 //accept incoming connection
