@@ -86,9 +86,11 @@ public class ClientNetworking {
                     {
                         while(!(message = buffer.readLine()).equals("END_CLIENT_LIST"))
                         {
-                            this.readingGUI.getMembersTextArea().append(message + "\n");
-                            readingGUI.pack();
+                            members += message + "\n";
+                            //this.readingGUI.getMembersTextArea().append(message + "\n");
+                            //readingGUI.pack();
                         }
+                        readingGUI.getMembersTextArea().setText(members);
                         readingGUI.pack();
                     }
                     //sends messages to the GUI
